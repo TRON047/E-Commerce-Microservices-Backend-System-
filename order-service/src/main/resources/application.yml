@@ -1,0 +1,40 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: order-service
+
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/orderdb
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      # JsonSerializer converts the OrderPlacedEvent record to JSON automatically
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        # Embed the Java type in the message header so the consumer can deserialize it
+        spring.json.add.type.headers: true
+      acks: all          # wait for all in-sync replicas to acknowledge
+      retries: 3
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+logging:
+  level:
+    com.ecommerce: DEBUG
+    org.springframework.kafka: INFO

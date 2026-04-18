@@ -1,0 +1,54 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: notification-service
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: notification-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.ecommerce.consumer,com.ecommerce.event"
+        spring.json.use.type.headers: false      # rely on target-type, not header type info
+        spring.json.value.default.type: com.ecommerce.consumer.OrderPlacedEvent
+
+  # ── Mail configuration ────────────────────────────────────────────────────
+  # Disabled by default (notification.mail.enabled=false below).
+  # To send real emails, uncomment and fill in your SMTP details:
+  #
+  # mail:
+  #   host: smtp.gmail.com
+  #   port: 587
+  #   username: your@gmail.com
+  #   password: your-app-password
+  #   properties:
+  #     mail.smtp.auth: true
+  #     mail.smtp.starttls.enable: true
+
+notification:
+  mail:
+    enabled: false                        # flip to true + configure spring.mail to send real emails
+    from: orders@ecommerce.local
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+logging:
+  level:
+    com.ecommerce: DEBUG
+    org.springframework.kafka: INFO
